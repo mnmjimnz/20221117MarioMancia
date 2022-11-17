@@ -1,0 +1,87 @@
+﻿<h3>Mantenimiento de Clinicas</h3>
+<form action="/" id="frmClinica">
+    <input type="hidden" name="id_clinica" id="id_clinica" />
+    <div class="row">
+        <div class="col-4">
+            <label>Nombre</label>
+            <input type="text" name="nombre" id="nombre" class="form-control" />
+        </div>
+        <div class="col-4">
+            <label>Direccion</label>
+            <input type="text" name="direccion" id="direccion" class="form-control" />
+        </div>
+        <div class="col-4">
+            <label>Telefono</label>
+            <input type="text" name="telefono" id="telefono" class="form-control" />
+        </div>
+    </div>
+
+    <button type="button" id="btnPost" data-action="post" onclick="post(this)" class="btn-success btn-sm">Guardar</button>
+    <button type="button" id="btnPost" onclick="limpiar()" class="btn-info btn-sm">Cancelar</button>
+</form>
+<table id="tablaCitas" class="table table-hover table-xs" data-columnas="id_clinica,nombre,direccion,telefono" data-url="/Clinica/ObtenerTodo">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Direccion</th>
+            <th>Telefono</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+<script>
+    var url = "/Clinica/Insertar";
+    function select() {
+        let arrya = [
+            { parametro: 'id_clinica', funcion: 'put', textoButton: 'Editar', classes: 'btn btn-success btn-sm' },
+            { parametro: 'id_clinica', funcion: 'deleteC', textoButton: 'Eliminar', classes: 'btn btn-danger btn-sm' }
+        ];
+        fun.llenarTablas($('#tablaCitas'), arrya,"");
+    }
+    function post() {
+        let data = $("#frmClinica").serialize();
+        fun.post(data, url, function () {
+            alert("Registro Almacenado");
+            select();
+            $('#frmClinica').trigger("reset");
+            $("#btnPost").text("Guardar");
+            url = "/Clinica/Insertar";
+        });
+
+    }
+    function put(id_clinica) {
+        $('#frmClinica').trigger("reset");
+        fillInput(id_clinica);
+        url = "/Clinica/Editar";
+        $("#btnPost").text("Editar");
+    }
+    function deleteC(id_clinica) {
+        let comf = confirm("Elminar registro?");
+        if (comf) {
+            fun.get("/Clinica/Eliminar?obj=" + id_clinica, function (data) {
+                alert("Registro eliminado");
+                select();
+            });
+        }
+
+    }
+    function fillInput(id_clinica) {
+        fun.get("/Clinica/Buscar?obj=" + id_clinica, function (d) {
+            $("#id_clinica").val(d.id_clinica);
+            $("#nombre").val(d.nombre);
+            $("#direccion").val(d.direccion);
+            $("#telefono").val(d.telefono);
+        });
+
+    }
+    function limpiar() {
+        $('#frmClinica').trigger("reset");
+        $("#btnPost").text("Guardar");
+        url = "/Clinica/Insertar";
+    }
+    $(document).ready(function () {
+        select();
+    });
+</script>

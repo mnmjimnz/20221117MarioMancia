@@ -1,0 +1,203 @@
+﻿<h3>Mantenimiento de Citas</h3>
+<form action="/" id="frmCita">
+    <input type="hidden" name="id_cita" id="id_cita" />
+    <div class="row">
+        <div class="col-4">
+            <label>Nombre</label>
+            <input type="text" name="nombre_paciente" id="nombre_paciente" class="form-control" />
+        </div>
+        <div class="col-4">
+            <label>direccion_paciente</label>
+            <input type="text" name="direccion_paciente" id="direccion_paciente" class="form-control" />
+        </div>
+        <div class="col-4">
+            <label>telefono_paciente</label>
+            <input type="text" name="telefono_paciente" id="telefono_paciente" class="form-control" />
+        </div>
+        <div class="col-4">
+            <label>dui_paciente</label>
+            <input type="text" name="dui_paciente" id="dui_paciente" class="form-control" />
+        </div>
+        <div class="col-4">
+            <label>fecha_cita</label>
+            <input type="text" name="fecha_cita" id="fecha_cita" class="form-control" />
+        </div>
+        <div class="col-4">
+            <label>hora_cita</label>
+            <input type="text" name="hora_cita" id="hora_cita" class="form-control" />
+        </div>
+        <div class="col-4">
+            <label>id_doctor</label>
+            <input type="text" name="id_doctor" id="id_doctor" class="form-control" />
+        </div>
+        <div class="col-4">
+            <label>id_clinica</label>
+            <input type="text" name="id_clinica" id="id_clinica" class="form-control" />
+        </div>
+
+    </div>
+
+    <button type="button" id="btnPost" data-action="post" onclick="post(this)" class="btn-success btn-sm">Guardar</button>
+    <button type="button" id="btnPost" onclick="limpiar()" class="btn-info btn-sm">Cancelar</button>
+</form>
+<table id="tablaCitas" class="table table-hover table-xs" data-columnas="id_cita,nombre_paciente,direccion_paciente,telefono_paciente,dui_paciente,fecha_cita,hora_cita,id_doctor,id_clinica" data-url="/Cita/ObtenerTodo">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Direccion</th>
+            <th>Telefono</th>
+            <th>Dui</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Doctor</th>
+            <th>Clinica</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<div class="modal" id="myModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/" id="frmDiagnostico">
+                    <div class="row">
+                        <div class="col-4">
+                            <input type="hidden" name="id_diagnostico" id="id_diagnostico" />
+                            <input type="hidden" name="id_cita_diag" id="id_cita_diag" />
+                            <label>Diagnostico</label>
+                            <input type="text" name="diagnostico" id="diagnostico" class="form-control" />
+                        </div>
+                    </div>
+                    <button type="button" id="btnPostDiag" data-action="post" onclick="postDiag(this)" class="btn-success btn-sm">Guardar</button>
+                    <button type="button" onclick="limpiarDiag()" class="btn-info btn-sm">Cancelar</button>
+                </form>
+                <table id="tablaDiagnostico" class="table table-hover table-xs" data-columnas="id_diagnostico,diagnostico" data-url="/Cita/BuscarDiagnostico">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Diagnostico</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var url = "/Cita/Insertar";
+    var urlDiag = "/Diagnostico/Insertar";
+    function select() {
+        let arrya = [
+            { parametro: 'id_cita', funcion: 'put', textoButton: 'Editar', classes: 'btn btn-success btn-sm' },
+            { parametro: 'id_cita', funcion: 'deleteC', textoButton: 'Eliminar', classes: 'btn btn-danger btn-sm' },
+            { parametro: 'id_cita', funcion: 'detalles', textoButton: 'Detalles', classes: 'btn btn-info btn-sm' }
+        ];
+        fun.llenarTablas($('#tablaCitas'), arrya, "");
+    }
+    function selectDiag(id_cita) {
+        let arrya = [
+            { parametro: 'id_diagnostico', funcion: 'putDia', textoButton: 'Editar', classes: 'btn btn-success btn-sm' },
+            { parametro: 'id_diagnostico', funcion: 'deleteDiag', textoButton: 'Eliminar', classes: 'btn btn-danger btn-sm' }
+        ];
+        $("#id_cita_diag").val(id_cita);
+        fun.llenarTablas($('#tablaDiagnostico'), arrya, "?obj=" + id_cita);
+    }
+    function post() {
+        let data = $("#frmCita").serialize();
+        fun.post(data, url, function () {
+            alert("Registro Almacenado");
+            select();
+            $('#frmCita').trigger("reset");
+            $("#btnPost").text("Guardar");
+            url = "/Cita/Insertar";
+        });
+    }
+    function postDiag() {
+        let data = $("#frmDiagnostico").serialize();
+        fun.post(data, urlDiag, function () {
+            alert("Registro Almacenado");
+            selectDiag();
+            $('#frmDiagnostico').trigger("reset");
+            $("#btnPostDiag").text("Guardar");
+            urlDiag = "/Diagnostico/Insertar";
+        });
+    }
+    function put(id_cita) {
+        $('#frmCita').trigger("reset");
+        fillInput(id_cita);
+        url = "/Cita/Editar";
+        $("#btnPost").text("Editar");
+    }
+    function putDia(id_diagnostico) {
+        $('#frmDiagnostico').trigger("reset");
+        fillInputDiag(id_diagnostico);
+        urlDiag = "/Diagnostico/Editar";
+        $("#btnPostDiag").text("Editar");
+    }
+    function deleteC(id_cita) {
+        let comf = confirm("Elminar registro?");
+        if (comf) {
+            fun.get("/Cita/Eliminar?obj=" + id_cita, function (data) {
+                alert("Registro eliminado");
+                select();
+            });
+        }
+    }
+    function deleteDiag(id_diagnostico) {
+        let comf = confirm("Elminar registro?");
+        if (comf) {
+            fun.get("/Diagnostico/Eliminar?obj=" + id_diagnostico, function (data) {
+                alert("Registro eliminado");
+                select();
+            });
+        }
+    }
+    function fillInput(id_cita) {
+        fun.get("/Cita/Buscar?obj=" + id_cita, function (d) {
+            $("#id_cita").val(d.id_cita);
+            $("#nombre_paciente").val(d.nombre_paciente);
+            $("#direccion_paciente").val(d.direccion_paciente);
+            $("#telefono_paciente").val(d.telefono_paciente);
+            $("#dui_paciente").val(d.dui_paciente);
+            $("#fecha_cita").val(d.fecha_cita);
+            $("#hora_cita").val(d.hora_cita);
+            $("#id_doctor").val(d.id_doctor);
+            $("#id_clinica").val(d.id_clinica);
+        });
+    }
+    function fillInputDiag(id_diagnostico) {
+        fun.get("/Diagnostico/Buscar?obj=" + id_diagnostico, function (d) {
+            $("#id_cita_diag").val(d.id_cita_diag);
+            $("#id_diagnostico").val(d.id_diagnostico);
+            $("#diagnostico").val(d.diagnostico);
+        });
+    }
+    function detalles(id_cita) {
+        $('#myModal').modal("show");
+        selectDiag(id_cita);
+    }
+    function limpiar() {
+        $('#frmCita').trigger("reset");
+        $("#btnPost").text("Guardar");
+        url = "/Cita/Insertar";
+    }
+    function limpiarDiag() {
+        $('#frmDiagnostico').trigger("reset");
+        $("#btnPostDiag").text("Guardar");
+        urlDiag = "/Diagnostico/Insertar";
+    }
+    $(document).ready(function () {
+        select();
+    });
+</script>

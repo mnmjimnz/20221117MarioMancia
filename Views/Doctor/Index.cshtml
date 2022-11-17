@@ -1,0 +1,93 @@
+﻿<h3>Mantenimiento de Doctor</h3>
+<form action="/" id="frmDoctor">
+    <input type="hidden" name="id_doctor" id="id_doctor" />
+    <div class="row">
+        <div class="col-4">
+            <label>Nombre</label>
+            <input type="text" name="nombre" id="nombre" class="form-control" />
+        </div>
+        <div class="col-4">
+            <label>especialidad</label>
+            <input type="text" name="especialidad" id="especialidad" class="form-control" />
+        </div>
+        <div class="col-4">
+            <label>diponible</label>
+            <input type="text" name="diponible" id="diponible" class="form-control" />
+        </div>
+        <div class="col-4">
+            <label>id_clinica</label>
+            <input type="text" name="id_clinica" id="id_clinica" class="form-control" />
+        </div>
+    </div>
+
+    <button type="button" id="btnPost" data-action="post" onclick="post(this)" class="btn-success btn-sm">Guardar</button>
+    <button type="button" id="btnPost" onclick="limpiar()" class="btn-info btn-sm">Cancelar</button>
+</form>
+<table id="tablaCitas" class="table table-hover table-xs" data-columnas="id_doctor,nombre,especialidad,diponible,id_clinica" data-url="/Doctor/ObtenerTodo">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Especialidad</th>
+            <th>Disponibilidad</th>
+            <th>Clinica</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+<script>
+    var url = "/Doctor/Insertar";
+    function select() {
+        let arrya = [
+            { parametro: 'id_doctor', funcion: 'put', textoButton: 'Editar', classes: 'btn btn-success btn-sm' },
+            { parametro: 'id_doctor', funcion: 'deleteC', textoButton: 'Eliminar', classes: 'btn btn-danger btn-sm' }
+        ];
+        fun.llenarTablas($('#tablaCitas'), arrya,"");
+    }
+    function post() {
+        let data = $("#frmDoctor").serialize();
+        fun.post(data, url, function () {
+            alert("Registro Almacenado");
+            select();
+            $('#frmDoctor').trigger("reset");
+            $("#btnPost").text("Guardar");
+            url = "/Doctor/Insertar";
+        });
+
+    }
+    function put(id_doctor) {
+        $('#frmDoctor').trigger("reset");
+        fillInput(id_doctor);
+        url = "/Doctor/Editar";
+        $("#btnPost").text("Editar");
+    }
+    function deleteC(id_doctor) {
+        let comf = confirm("Elminar registro?");
+        if (comf) {
+            fun.get("/Doctor/Eliminar?obj=" + id_doctor, function (data) {
+                alert("Registro eliminado");
+                select();
+            });
+        }
+
+    }
+    function fillInput(id_doctor) {
+        fun.get("/Doctor/Buscar?obj=" + id_doctor, function (d) {
+            $("#id_doctor").val(d.id_doctor);
+            $("#nombre").val(d.nombre);
+            $("#especialidad").val(d.especialidad);
+            $("#diponible").val(d.diponible);
+            $("#id_clinica").val(d.id_clinica);
+        });
+
+    }
+    function limpiar() {
+        $('#frmDoctor').trigger("reset");
+        $("#btnPost").text("Guardar");
+        url = "/Doctor/Insertar";
+    }
+    $(document).ready(function () {
+        select();
+    });
+</script>
